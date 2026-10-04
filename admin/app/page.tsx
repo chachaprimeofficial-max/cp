@@ -6,6 +6,7 @@ import { adminLogout, getAdminMe, TOKEN_KEY } from '../lib/auth';
 
 type Product = { _id:string; name:string; slug:string; price:number; compareAtPrice?:number; stock:number; featured?:boolean; isActive?:boolean; description?:string; images?:string[] };
 type Order = { _id:string; orderNumber:string; userId:string; total:number; status:string; paymentStatus:string; createdAt?:string; items?:{name:string;quantity:number}[] };
+type GroupBuy = { _id:string; groupNumber:string; productName:string; targetAmount:number; contributionAmount:number; targetMembers:number; members:{userId:string;amount:number;paymentStatus:string}[]; status:string; expiresAt:string };
 type Refund = { _id:string; refundNumber:string; orderNumber:string; userId:string; amount:number; reason:string; status:string; refundMethod:string; adminNote?:string; createdAt?:string };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
@@ -27,6 +28,7 @@ export default function Admin() {
   const [products,setProducts]=useState<Product[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
   const [refunds,setRefunds]=useState<Refund[]>([]);
+  const [groupBuys,setGroupBuys]=useState<GroupBuy[]>([]);
   const [loading,setLoading]=useState(true);
   const [message,setMessage]=useState('');
   const [editing,setEditing]=useState<Product|null>(null);
@@ -35,8 +37,8 @@ export default function Admin() {
   const load=async()=>{
     setLoading(true);
     try {
-      const [p,o,r]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list'),api('/api/v1/refunds/admin/list')]);
-      setProducts(p.items||[]); setOrders(o||[]); setRefunds(r||[]);
+      const [p,o,r]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list'),api('/api/v1/refunds/admin/list'),api('/api/v1/group-buy/admin/list')]);
+      setProducts(p.items||[]); setOrders(o||[]); setRefunds(r||[]); setGroupBuys(arguments[0]||[]);
       setMessage('');
     } catch(e){ setMessage(e instanceof Error ? e.message : 'Unable to load admin data.'); }
     finally{setLoading(false);}
