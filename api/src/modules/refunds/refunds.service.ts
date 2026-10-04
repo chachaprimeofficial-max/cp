@@ -4,12 +4,14 @@ import { Model } from 'mongoose';
 import { Refund, RefundDocument } from './refund.schema';
 import { Order, OrderDocument } from '../orders/order.schema';
 import { CreateRefundDto } from './dto/create-refund.dto';
+import { WalletService } from '../wallet/wallet.service';
 
 @Injectable()
 export class RefundsService {
   constructor(
     @InjectModel(Refund.name) private readonly refunds: Model<RefundDocument>,
     @InjectModel(Order.name) private readonly orders: Model<OrderDocument>,
+    private readonly wallet: WalletService,
   ) {}
 
   async createRequest(userId: string, dto: CreateRefundDto) {
@@ -39,6 +41,17 @@ export class RefundsService {
       status: 'requested',
       refundMethod: 'wallet',
     });
+  }
+
+  async complete(refundNumber: string) {
+    const refund = await this.refunds.findOne({ refundNumber }).lean();
+    if (!refund) throw new NotFoundException('Refund not found.');
+    if (refund.status === 'completed') throw new BadRequestException('Refund is already completed.');
+    if (refund.status !== 'approved') throw new BadRequestException('Refund must be approved before completion.');
+    await this.wallet.credit(refund.userId, refund.amount, 'refund', refund.refundNumber, \\`Refund for order \\${refund.orderNumber}\\`);
+    const updated = await this.refunds.findOneAndUpdate({ refundNumber, status: 'approved' }, { status: 'completed', completedAt: new Date() }, { new: true }).lean();
+    if (!updated) throw new BadRequestException('Refund status changed before completion.');
+    return updated;
   }
 
   mine(userId: string) {
