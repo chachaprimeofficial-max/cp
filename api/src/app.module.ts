@@ -19,11 +19,12 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { WalletModule } from './modules/wallet/wallet.module';
+import { RefundsModule } from './modules/refunds/refunds.module';
 
 @Module({
  imports:[
   ConfigModule.forRoot({isGlobal:true}),
-  AuthModule, OrdersModule, CouponsModule, PaymentsModule, WalletModule,
+  AuthModule, OrdersModule, CouponsModule, PaymentsModule, WalletModule, RefundsModule,
   MongooseModule.forRootAsync({useFactory:()=>({uri:process.env.MONGODB_URI})}),
   MongooseModule.forFeature([
    {name:Product.name,schema:ProductSchema},{name:Category.name,schema:CategorySchema},
