@@ -14,6 +14,10 @@ export class GroupBuyController {
   @Post() create(@Req() req: any, @Body() dto: CreateGroupBuyDto) { return this.service.create(req.user.sub, dto); }
   @Post(':groupNumber/join') join(@Req() req: any, @Param('groupNumber') groupNumber: string) { return this.service.join(groupNumber, req.user.sub); }
 
+  @Get('admin/list')
+  @UseGuards(AdminGuard)
+  adminList() { return this.service.listAdmin(); }
+
   @Post('admin/expire')
   @UseGuards(AdminGuard)
   expire() { return this.service.expireFailedGroups(); }
