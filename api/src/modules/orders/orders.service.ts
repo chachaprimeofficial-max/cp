@@ -77,4 +77,19 @@ export class OrdersService {
     if (!order) throw new NotFoundException('Order not found.');
     return order;
   }
+
+  adminList(status?: string) {
+    const filter = status ? { status } : {};
+    return this.orders.find(filter).sort({ createdAt: -1 }).limit(100).lean();
+  }
+
+  async adminUpdateStatus(orderNumber: string, status: string) {
+    const order = await this.orders.findOneAndUpdate(
+      { orderNumber },
+      { status },
+      { new: true, runValidators: true },
+    ).lean();
+    if (!order) throw new NotFoundException('Order not found.');
+    return order;
+  }
 }
