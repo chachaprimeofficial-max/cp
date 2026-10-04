@@ -9,3 +9,5 @@ export async function getMyOrders(token:string){const response=await fetch(`${AP
 
 
 export async function createPayment(token:string,body:{orderNumber:string;method:'card'|'paypal';currency?:string}){const response=await fetch(`${API_URL}/api/v1/payments/checkout`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify(body)});const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to initialize payment');return data;}
+
+export async function getWallet(token:string){const response=await fetch(`${API_URL}/api/v1/wallet`,{headers:{Authorization:`Bearer ${token}`}});const data=await response.json();if(!response.ok)throw new Error(data.message||'Unable to load wallet');return data;}
