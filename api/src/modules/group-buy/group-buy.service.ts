@@ -68,6 +68,8 @@ export class GroupBuyService {
     return { refundedGroups, refundedMembers };
   }
 
+  async listAdmin() { return this.groups.find().sort({ createdAt: -1 }).limit(100).lean(); }
+
   async mine(userId: string) { return this.groups.find({ 'members.userId': userId }).sort({ createdAt: -1 }).limit(100).lean(); }
   async listOpen() { return this.groups.find({ status: 'open', expiresAt: { $gt: new Date() } }).sort({ createdAt: -1 }).limit(100).lean(); }
 }
