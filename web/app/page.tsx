@@ -1,1 +1,21 @@
-export default function Home(){return <main className="shell"><header><img src="/logo.svg" alt="Chacha Prime"/><nav><a href="/shop">Shop</a><a>Categories</a><a>Deals</a><a>New Arrivals</a></nav><div className="home-actions"><a href="/login">Account</a><a href="/cart">Cart</a></div></header><section className="hero"><div><span className="eyebrow">CURATED FOR MODERN LIFE</span><h1>Better choices.<br/><em>Brighter life.</em></h1><p>Discover a premium collection selected for quality, value and everyday living.</p><div className="actions"><a href="/shop" className="primary">Explore products</a><button className="secondary">View deals</button></div></div><div className="hero-card"><span>PRIME PICK</span><strong>Designed around you.</strong><small>Smart discovery powered by Chacha Prime AI.</small></div></section><section className="strip"><span>Secure checkout</span><span>Fast delivery</span><span>Premium quality</span><span>24/7 support</span></section></main>}
+import CartButton from '../components/cart-button';
+
+export default function Home(){
+  return <main className="shell">
+    <header>
+      <img src="/logo.svg" alt="Chacha Prime"/>
+      <nav><a href="/shop">Shop</a><a href="/shop">Categories</a><a href="/shop">Deals</a><a href="/shop">New Arrivals</a></nav>
+      <div className="home-actions"><a href="/account">Account</a><CartButton /></div>
+    </header>
+    <section className="hero">
+      <div>
+        <span className="eyebrow">CURATED FOR MODERN LIFE</span>
+        <h1>Better choices.<br/><em>Brighter life.</em></h1>
+        <p>Discover a premium collection selected for quality, value and everyday living.</p>
+        <div className="actions"><a href="/shop" className="primary">Explore products</a><a href="/shop" className="secondary">View deals</a></div>
+      </div>
+      <div className="hero-card"><span>PRIME PICK</span><strong>Designed around you.</strong><small>Smart discovery powered by Chacha Prime AI.</small></div>
+    </section>
+    <section className="strip"><span>Secure checkout</span><span>Fast delivery</span><span>Premium quality</span><span>24/7 support</span></section>
+  </main>
+}
