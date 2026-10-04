@@ -37,8 +37,8 @@ export default function Admin() {
   const load=async()=>{
     setLoading(true);
     try {
-      const [p,o,r]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list'),api('/api/v1/refunds/admin/list'),api('/api/v1/group-buy/admin/list')]);
-      setProducts(p.items||[]); setOrders(o||[]); setRefunds(r||[]); setGroupBuys(arguments[0]||[]);
+      const [p,o,r,g]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list'),api('/api/v1/refunds/admin/list'),api('/api/v1/group-buy/admin/list')]);
+      setProducts(p.items||[]); setOrders(o||[]); setRefunds(r||[]); setGroupBuys(g||[]);
       setMessage('');
     } catch(e){ setMessage(e instanceof Error ? e.message : 'Unable to load admin data.'); }
     finally{setLoading(false);}
