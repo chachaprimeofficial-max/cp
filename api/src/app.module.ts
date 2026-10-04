@@ -20,11 +20,12 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { RefundsModule } from './modules/refunds/refunds.module';
+import { GroupBuyModule } from './modules/group-buy/group-buy.module';
 
 @Module({
  imports:[
   ConfigModule.forRoot({isGlobal:true}),
-  AuthModule, OrdersModule, CouponsModule, PaymentsModule, WalletModule, RefundsModule,
+  AuthModule, OrdersModule, CouponsModule, PaymentsModule, WalletModule, RefundsModule, GroupBuyModule,
   MongooseModule.forRootAsync({useFactory:()=>({uri:process.env.MONGODB_URI})}),
   MongooseModule.forFeature([
    {name:Product.name,schema:ProductSchema},{name:Category.name,schema:CategorySchema},
