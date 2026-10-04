@@ -1,7 +1,9 @@
-import { Controller, Get, Param, Post, Req, UseGuards, Body } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Patch, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AdminGuard } from '../auth/admin.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrdersService } from './orders.service';
 
 type AuthenticatedRequest = Request & { user: { sub: string } };
@@ -19,6 +21,18 @@ export class OrdersController {
   @Get('mine')
   mine(@Req() req: AuthenticatedRequest) {
     return this.orders.mine(req.user.sub);
+  }
+
+  @Get('admin/list')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  adminList(@Query('status') status?: string) {
+    return this.orders.adminList(status);
+  }
+
+  @Patch('admin/:orderNumber/status')
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  adminUpdateStatus(@Param('orderNumber') orderNumber: string, @Body() dto: UpdateOrderStatusDto) {
+    return this.orders.adminUpdateStatus(orderNumber, dto.status);
   }
 
   @Get(':orderNumber')
