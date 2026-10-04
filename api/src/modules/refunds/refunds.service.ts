@@ -48,7 +48,7 @@ export class RefundsService {
     if (!refund) throw new NotFoundException('Refund not found.');
     if (refund.status === 'completed') throw new BadRequestException('Refund is already completed.');
     if (refund.status !== 'approved') throw new BadRequestException('Refund must be approved before completion.');
-    await this.wallet.credit(refund.userId, refund.amount, 'refund', refund.refundNumber, \\`Refund for order \\${refund.orderNumber}\\`);
+    await this.wallet.credit(refund.userId, refund.amount, 'refund', refund.refundNumber, `Refund for order ${refund.orderNumber}`);
     const updated = await this.refunds.findOneAndUpdate({ refundNumber, status: 'approved' }, { status: 'completed', completedAt: new Date() }, { new: true }).lean();
     if (!updated) throw new BadRequestException('Refund status changed before completion.');
     return updated;
