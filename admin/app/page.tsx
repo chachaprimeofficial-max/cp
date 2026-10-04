@@ -1,6 +1,8 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { adminLogout, getAdminMe, TOKEN_KEY } from '../lib/auth';
 
 type Product = { _id:string; name:string; slug:string; price:number; compareAtPrice?:number; stock:number; featured?:boolean; isActive?:boolean; description?:string; images?:string[] };
 type Order = { _id:string; orderNumber:string; userId:string; total:number; status:string; paymentStatus:string; createdAt?:string; items?:{name:string;quantity:number}[] };
@@ -19,6 +21,9 @@ async function api(path:string, options:RequestInit={}) {
 }
 
 export default function Admin() {
+  const router = useRouter();
+  const [authChecking,setAuthChecking]=useState(true);
+  const [adminName,setAdminName]=useState('');
   const [products,setProducts]=useState<Product[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
   const [loading,setLoading]=useState(true);
@@ -35,7 +40,21 @@ export default function Admin() {
     } catch(e){ setMessage(e instanceof Error ? e.message : 'Unable to load admin data.'); }
     finally{setLoading(false);}
   };
-  useEffect(()=>{load();},[]);
+  useEffect(()=>{
+    let active=true;
+    const verify=async()=>{
+      const token=localStorage.getItem(TOKEN_KEY);
+      if(!token){router.replace('/login');return;}
+      const user=await getAdminMe(token);
+      if(!active)return;
+      if(!user){adminLogout();router.replace('/login');return;}
+      setAdminName(user.name);
+      setAuthChecking(false);
+      load();
+    };
+    verify().catch(()=>{if(active){adminLogout();router.replace('/login');}});
+    return()=>{active=false;};
+  },[]);
 
   const stats=useMemo(()=>({
     products:products.length,
@@ -70,6 +89,8 @@ export default function Admin() {
     catch(e){setMessage(e instanceof Error?e.message:'Unable to update order.');}
   }
 
+  if (authChecking) return <main className="admin-auth-page"><div className="admin-auth-card"><img src="/logo.svg" alt="Chacha Prime" className="admin-auth-logo"/><span className="eyebrow">SECURE ADMIN ACCESS</span><h1>Verifying access.</h1><p>Checking administrator credentials...</p></div></main>;
+
   return <div className="admin-shell">
     <aside className="sidebar">
       <div className="brand"><img src="/logo.svg" alt="Chacha Prime"/><div><strong>CHACHA PRIME</strong><small>ADMIN CONSOLE</small></div></div>
@@ -78,7 +99,7 @@ export default function Admin() {
     </aside>
 
     <main className="main" id="overview">
-      <div className="topbar"><div><span className="eyebrow">COMMAND CENTER</span><h1>Operations overview</h1><div className="muted">Manage your live catalog and fulfilment workflow.</div></div><div className="status">LIVE CONTROL</div></div>
+      <div className="topbar"><div><span className="eyebrow">COMMAND CENTER</span><h1>Operations overview</h1><div className="muted">Manage your live catalog and fulfilment workflow.</div></div><div className="top-actions"><span className="status">LIVE CONTROL</span><span className="admin-user">{adminName}</span><button className="button ghost" onClick={()=>{adminLogout();router.replace('/login');}}>Sign out</button></div></div>
       {message && <div className="notice">{message}</div>}
       <section className="metrics">
         <div className="metric"><span>Total products</span><strong>{loading?'—':stats.products}</strong><small>Catalog records</small></div>
