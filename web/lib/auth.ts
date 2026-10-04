@@ -40,3 +40,9 @@ export async function createOrder(token: string, body: { items: { productId: str
   if (!response.ok) throw new Error(data.message || 'Unable to create order');
   return data;
 }
+
+export async function getMyOrders(token: string) {
+  const response = await fetch(`${API_URL}/api/v1/orders/mine`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!response.ok) return [];
+  return response.json() as Promise<Array<{ orderNumber: string; total: number; status: string; paymentStatus: string; createdAt: string }>>;
+}
