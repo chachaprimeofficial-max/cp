@@ -18,6 +18,24 @@ export class RefundsController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/list')
+  adminList(@Req() req: AuthenticatedRequest) {
+    return this.refunds.adminList(typeof req.query.status === 'string' ? req.query.status : undefined);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('admin/:refundNumber/approve')
+  approve(@Param('refundNumber') refundNumber: string, @Body() body: { adminNote?: string }) {
+    return this.refunds.approve(refundNumber, body.adminNote);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('admin/:refundNumber/reject')
+  reject(@Param('refundNumber') refundNumber: string, @Body() body: { adminNote?: string }) {
+    return this.refunds.reject(refundNumber, body.adminNote);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('admin/:refundNumber/complete')
   complete(@Param('refundNumber') refundNumber: string) {
     return this.refunds.complete(refundNumber);
