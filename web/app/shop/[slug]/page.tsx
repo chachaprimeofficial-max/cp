@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getProduct } from '../../../lib/api';
+import AddToCart from '../../../components/add-to-cart';
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -20,7 +21,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="price">£{product.price.toFixed(2)}</div>
           {product.compareAtPrice ? <del>Was £{product.compareAtPrice.toFixed(2)}</del> : null}
           <p>{product.description || 'A carefully selected Chacha Prime product.'}</p>
-          <button className="primary">Add to cart</button>
+          <AddToCart product={product} />
         </div>
       </section>
     </main>
