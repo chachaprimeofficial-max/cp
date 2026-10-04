@@ -1,31 +1,6 @@
 {
-  "name": "api",
-  "private": true,
-  "version": "0.1.0",
-  "scripts": {
-    "build": "nest build",
-    "start": "node dist/main",
-    "start:dev": "nest start --watch"
-  },
-  "dependencies": {
-    "@nestjs/common": "latest",
-    "@nestjs/core": "latest",
-    "@nestjs/config": "latest",
-    "@nestjs/mongoose": "latest",
-    "mongoose": "latest",
-    "class-transformer": "latest",
-    "class-validator": "latest",
-    "reflect-metadata": "latest",
-    "rxjs": "latest",
-    "@nestjs/jwt": "latest",
-    "bcrypt": "latest"
-  },
-  "devDependencies": {
-    "@nestjs/cli": "latest",
-    "typescript": "latest",
-    "ts-node": "latest",
-    "@types/node": "latest",
-    "@types/bcrypt": "latest",
-    "@types/express": "latest"
-  }
+  "name":"api","private":true,"version":"0.1.0",
+  "scripts":{"build":"nest build","start":"node dist/main","start:dev":"nest start --watch"},
+  "dependencies":{"@nestjs/common":"latest","@nestjs/core":"latest","@nestjs/config":"latest","@nestjs/mongoose":"latest","mongoose":"latest","class-transformer":"latest","class-validator":"latest","reflect-metadata":"latest","rxjs":"latest","@nestjs/jwt":"latest","bcrypt":"latest"},
+  "devDependencies":{"@nestjs/cli":"latest","typescript":"^6.0.0","ts-node":"latest","@types/node":"latest","@types/bcrypt":"latest","@types/express":"latest"}
 }
