@@ -4,7 +4,7 @@ export default function Home(){
   return <main className="shell">
     <header>
       <img src="/logo.svg" alt="Chacha Prime"/>
-      <nav><a href="/shop">Shop</a><a href="/shop">Categories</a><a href="/shop">Deals</a><a href="/shop">New Arrivals</a><a href="/group-buy">Group Buying</a></nav>
+      <nav><a href="/shop">Shop</a><a href="/shop">Categories</a><a href="/shop">Deals</a><a href="/shop">New Arrivals</a><a href="/group-buy">Group Buying</a><a href="/group-buy">Group Buying</a></nav>
       <div className="home-actions"><a href="/account">Account</a><a href="/returns">Returns</a><CartButton /></div>
     </header>
     <section className="hero">
