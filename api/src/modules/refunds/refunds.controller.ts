@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AdminGuard } from '../auth/admin.guard';
 import { RefundsService } from './refunds.service';
 import { CreateRefundDto } from './dto/create-refund.dto';
 
@@ -14,6 +15,12 @@ export class RefundsController {
   @Post()
   create(@Req() req: AuthenticatedRequest, @Body() dto: CreateRefundDto) {
     return this.refunds.createRequest(req.user.sub, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('admin/:refundNumber/complete')
+  complete(@Param('refundNumber') refundNumber: string) {
+    return this.refunds.complete(refundNumber);
   }
 
   @Get('mine')
