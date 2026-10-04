@@ -6,9 +6,9 @@ import { adminLogout, getAdminMe, TOKEN_KEY } from '../lib/auth';
 
 type Product = { _id:string; name:string; slug:string; price:number; compareAtPrice?:number; stock:number; featured?:boolean; isActive?:boolean; description?:string; images?:string[] };
 type Order = { _id:string; orderNumber:string; userId:string; total:number; status:string; paymentStatus:string; createdAt?:string; items?:{name:string;quantity:number}[] };
+type Refund = { _id:string; refundNumber:string; orderNumber:string; userId:string; amount:number; reason:string; status:string; refundMethod:string; adminNote?:string; createdAt?:string };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-const TOKEN_KEY = 'cp_access_token';
 
 async function api(path:string, options:RequestInit={}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
@@ -26,6 +26,7 @@ export default function Admin() {
   const [adminName,setAdminName]=useState('');
   const [products,setProducts]=useState<Product[]>([]);
   const [orders,setOrders]=useState<Order[]>([]);
+  const [refunds,setRefunds]=useState<Refund[]>([]);
   const [loading,setLoading]=useState(true);
   const [message,setMessage]=useState('');
   const [editing,setEditing]=useState<Product|null>(null);
@@ -34,8 +35,8 @@ export default function Admin() {
   const load=async()=>{
     setLoading(true);
     try {
-      const [p,o]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list')]);
-      setProducts(p.items||[]); setOrders(o||[]);
+      const [p,o,r]=await Promise.all([api('/api/v1/products?limit=60'),api('/api/v1/orders/admin/list'),api('/api/v1/refunds/admin/list')]);
+      setProducts(p.items||[]); setOrders(o||[]); setRefunds(r||[]);
       setMessage('');
     } catch(e){ setMessage(e instanceof Error ? e.message : 'Unable to load admin data.'); }
     finally{setLoading(false);}
@@ -84,6 +85,10 @@ export default function Admin() {
     try{await api(`/api/v1/products/${id}`,{method:'DELETE'});setMessage('Product archived.');await load();}
     catch(e){setMessage(e instanceof Error?e.message:'Unable to archive product.');}
   }
+  async function refundAction(refundNumber:string,action:'approve'|'reject'|'complete'){
+    try{await api(`/api/v1/refunds/admin/${encodeURIComponent(refundNumber)}/${action}`,{method:'POST',body:JSON.stringify({})});setMessage(`Refund ${refundNumber} ${action}d.`);await load();}
+    catch(e){setMessage(e instanceof Error?e.message:'Unable to update refund.');}
+  }
   async function status(orderNumber:string,status:string){
     try{await api(`/api/v1/orders/admin/${encodeURIComponent(orderNumber)}/status`,{method:'PATCH',body:JSON.stringify({status})});setMessage(`Order ${orderNumber} updated.`);await load();}
     catch(e){setMessage(e instanceof Error?e.message:'Unable to update order.');}
@@ -94,7 +99,7 @@ export default function Admin() {
   return <div className="admin-shell">
     <aside className="sidebar">
       <div className="brand"><img src="/logo.svg" alt="Chacha Prime"/><div><strong>CHACHA PRIME</strong><small>ADMIN CONSOLE</small></div></div>
-      <nav className="nav"><a className="active" href="#overview">Overview</a><a href="#products">Products</a><a href="#orders">Orders</a><a href="#inventory">Inventory</a><a href="#ai-insights">AI Insights</a></nav>
+      <nav className="nav"><a className="active" href="#overview">Overview</a><a href="#products">Products</a><a href="#orders">Orders</a><a href="#refunds">Refunds</a><a href="#inventory">Inventory</a><a href="#ai-insights">AI Insights</a></nav>
       <div className="sidebar-footer">Single-vendor commerce operations.<br/>Built for Chacha Prime.</div>
     </aside>
 
@@ -136,6 +141,8 @@ export default function Admin() {
           {!orders.length&&!loading&&<div className="empty">No orders found or administrator authentication is required.</div>}
         </div>
       </section>
+
+      <section className="panel" id="refunds"><div className="panel-head"><h2>Refund management</h2><span>{refunds.length} latest requests</span></div><div className="table order-table"><div className="row head"><span>Refund</span><span>Amount</span><span>Status</span><span>Actions</span></div>{refunds.map(r=><div className="row" key={r._id}><span><strong>{r.refundNumber}</strong><small className="sub">{r.orderNumber} · {r.reason}</small></span><span>£{r.amount.toFixed(2)}</span><span><span className="pill">{r.status}</span></span><span className="actions-cell">{r.status==='requested'&&<><button onClick={()=>refundAction(r.refundNumber,'approve')}>Approve</button><button onClick={()=>refundAction(r.refundNumber,'reject')}>Reject</button></>}{r.status==='approved'&&<button onClick={()=>refundAction(r.refundNumber,'complete')}>Refund to wallet</button>}</span></div>)}{!refunds.length&&!loading&&<div className="empty">No refund requests found.</div>}</div></section>
 
       <section className="panel ai" id="ai-insights"><div className="panel-head"><h2>AI operations layer</h2><span>Next intelligence pass</span></div><p>Live catalog and order data are now available to the admin control layer. The next stage can safely add smart search, recommendations, customer support, review summaries and operational insights on top of these records.</p></section>
     </main>
