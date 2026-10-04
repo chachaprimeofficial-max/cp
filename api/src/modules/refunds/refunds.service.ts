@@ -17,8 +17,13 @@ export class RefundsService {
   async createRequest(userId: string, dto: CreateRefundDto) {
     const order = await this.orders.findOne({ userId, orderNumber: dto.orderNumber }).lean();
     if (!order) throw new NotFoundException('Order not found.');
-    if (!['paid', 'completed', 'delivered'].includes(order.paymentStatus) && order.status !== 'delivered') {
-      throw new BadRequestException('This order is not eligible for a refund request yet.');
+    const deliveredAt = order.status === 'delivered' ? (order as any).updatedAt ?? (order as any).createdAt : null;
+    if (order.status !== 'delivered' || !deliveredAt) {
+      throw new BadRequestException('This order is eligible for a refund request after delivery.');
+    }
+    const daysSinceDelivery = (Date.now() - new Date(deliveredAt).getTime()) / 86400000;
+    if (daysSinceDelivery > 7) {
+      throw new BadRequestException('The 7-business-day refund window has expired.');
     }
 
     const existing = await this.refunds.findOne({
