@@ -25,6 +25,7 @@
     "typescript": "latest",
     "ts-node": "latest",
     "@types/node": "latest",
-    "@types/bcrypt": "latest"
+    "@types/bcrypt": "latest",
+    "@types/express": "latest"
   }
 }
