@@ -1,0 +1,6 @@
+'use client';
+import Link from 'next/link'; import { useEffect,useState } from 'react'; import { getMe,TOKEN_KEY,User } from '../../lib/auth';
+export default function AccountPage(){const [user,setUser]=useState<User|null>(null);const [loading,setLoading]=useState(true);useEffect(()=>{const t=localStorage.getItem(TOKEN_KEY);if(t)getMe(t).then(setUser).finally(()=>setLoading(false));else setLoading(false)},[]);
+if(loading)return <main className="auth-page"><section className="auth-card"><p>Loading your account…</p></section></main>;
+if(!user)return <main className="auth-page"><section className="auth-card"><span className="eyebrow">CHACHA PRIME ACCOUNT</span><h1>Sign in to continue.</h1><Link href="/login" className="primary">Sign in</Link></section></main>;
+return <main className="account-page"><span className="eyebrow">MY PRIME ACCOUNT</span><h1>Hello, {user.name}.</h1><div className="account-grid"><section className="account-card"><span>ACCOUNT</span><h2>{user.email}</h2><p>Role: {user.role}</p></section><section className="account-card"><span>CHACHA WALLET</span><h2>£{user.walletBalance.toFixed(2)}</h2><p>Your wallet balance can receive eligible refunds and credits.</p></section><section className="account-card"><span>SHOPPING</span><h2>Ready for your next order?</h2><Link href="/shop" className="primary">Explore products</Link></section></div></main>}
