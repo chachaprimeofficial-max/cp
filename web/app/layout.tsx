@@ -1,0 +1,1 @@
+import "./globals.css"; export const metadata={title:"Chacha Prime — Better Choices, Brighter Life",description:"Premium single-vendor shopping"}; export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body>{children}</body></html>}
