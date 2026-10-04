@@ -5,7 +5,7 @@ export default function Home(){
     <header>
       <img src="/logo.svg" alt="Chacha Prime"/>
       <nav><a href="/shop">Shop</a><a href="/shop">Categories</a><a href="/shop">Deals</a><a href="/shop">New Arrivals</a></nav>
-      <div className="home-actions"><a href="/account">Account</a><CartButton /></div>
+      <div className="home-actions"><a href="/account">Account</a><a href="/returns">Returns</a><CartButton /></div>
     </header>
     <section className="hero">
       <div>
