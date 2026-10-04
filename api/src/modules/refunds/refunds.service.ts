@@ -43,6 +43,31 @@ export class RefundsService {
     });
   }
 
+  adminList(status?: string) {
+    const filter = status ? { status } : {};
+    return this.refunds.find(filter).sort({ createdAt: -1 }).limit(100).lean();
+  }
+
+  async approve(refundNumber: string, adminNote?: string) {
+    const updated = await this.refunds.findOneAndUpdate(
+      { refundNumber, status: 'requested' },
+      { status: 'approved', ...(adminNote ? { adminNote: adminNote.trim() } : {}) },
+      { new: true },
+    ).lean();
+    if (!updated) throw new BadRequestException('Refund must be in requested status.');
+    return updated;
+  }
+
+  async reject(refundNumber: string, adminNote?: string) {
+    const updated = await this.refunds.findOneAndUpdate(
+      { refundNumber, status: 'requested' },
+      { status: 'rejected', ...(adminNote ? { adminNote: adminNote.trim() } : {}) },
+      { new: true },
+    ).lean();
+    if (!updated) throw new BadRequestException('Refund must be in requested status.');
+    return updated;
+  }
+
   async complete(refundNumber: string) {
     const refund = await this.refunds.findOne({ refundNumber }).lean();
     if (!refund) throw new NotFoundException('Refund not found.');
