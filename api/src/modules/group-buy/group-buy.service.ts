@@ -29,11 +29,26 @@ export class GroupBuyService {
     if (group.status !== 'open' || new Date(group.expiresAt).getTime() <= Date.now()) throw new BadRequestException('This group buy is no longer open.');
     if (group.members.some((member) => member.userId === userId)) throw new BadRequestException('You already joined this group.');
     if (group.members.length >= group.targetMembers) throw new BadRequestException('This group is full.');
-    await this.wallet.debit(userId, group.contributionAmount, 'group_buy', groupNumber, `Group buy contribution for ${group.productName}`);
-    const members = [...group.members, { userId, amount: group.contributionAmount, paymentStatus: 'paid', joinedAt: new Date() }];
-    const total = members.reduce((sum, member) => sum + member.amount, 0);
-    const status = total >= group.targetAmount || members.length >= group.targetMembers ? 'funded' : 'open';
-    return this.groups.findOneAndUpdate({ groupNumber, status: 'open' }, { members, status }, { new: true }).lean();
+
+    const contribution = group.contributionAmount;
+    await this.wallet.debit(userId, contribution, 'group_buy', groupNumber, `Group buy contribution for ${group.productName}`);
+
+    const updated = await this.groups.findOneAndUpdate(
+      { groupNumber, status: 'open', expiresAt: { $gt: new Date() }, 'members.userId': { $ne: userId }, $expr: { $lt: [{ $size: '$members' }, '$targetMembers'] } },
+      { $push: { members: { userId, amount: contribution, paymentStatus: 'paid', joinedAt: new Date() } } },
+      { new: true },
+    ).lean();
+
+    if (!updated) {
+      await this.wallet.credit(userId, contribution, 'group_buy_join_rollback', `${groupNumber}:join-rollback:${userId}`, `Group buy join could not be completed for ${groupNumber}`);
+      throw new BadRequestException('The group changed while you were joining. Your contribution was returned to your wallet.');
+    }
+
+    const total = updated.members.reduce((sum, member) => sum + member.amount, 0);
+    if (total >= updated.targetAmount || updated.members.length >= updated.targetMembers) {
+      return this.groups.findOneAndUpdate({ groupNumber, status: 'open' }, { status: 'funded' }, { new: true }).lean();
+    }
+    return updated;
   }
 
   async expireFailedGroups() {
