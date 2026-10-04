@@ -4,9 +4,10 @@ import { Refund, RefundSchema } from './refund.schema';
 import { Order, OrderSchema } from '../orders/order.schema';
 import { RefundsController } from './refunds.controller';
 import { RefundsService } from './refunds.service';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([
+  imports: [WalletModule, MongooseModule.forFeature([
     { name: Refund.name, schema: RefundSchema },
     { name: Order.name, schema: OrderSchema },
   ])],
