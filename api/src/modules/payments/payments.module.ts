@@ -4,9 +4,11 @@ import { Payment, PaymentSchema } from './payment.schema';
 import { Order, OrderSchema } from '../orders/order.schema';
 import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
+import { WalletModule } from '../wallet/wallet.module';
 
 @Module({
   imports: [
+    WalletModule,
     MongooseModule.forFeature([
       { name: Payment.name, schema: PaymentSchema },
       { name: Order.name, schema: OrderSchema },
